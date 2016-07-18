@@ -1,0 +1,28 @@
+extends layout
+
+block content
+	// Header bar
+	.navbar.navbar-inverse(role="navigation")
+		.container.center
+			h2#title-text.white= title
+
+	// Player name input
+	#join.container.theme-showcase.center.middle
+		.middle
+			table.table-wide.center
+				tr
+					td
+						h3.bold(style="margin-right: 10px;"): i Name
+					td
+						input#playername.form-control(type="text")
+
+		input#enterButton.btn.btn-primary.btn-wide(type="button", value="Enter Game")
+
+	// Players that have entered the game
+	#players.hidden.container.theme-showcase.center.middle
+		.middle
+			ul#player-list.center
+		input#readyButton.btn.btn-primary.btn-wide(type="button", value="Everyone's in")
+
+block pagescripts
+	!= js("index")
