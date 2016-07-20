@@ -85,10 +85,11 @@ module.exports = app;
 var players_to_sockets = {};
 var socket_ids_to_players = {};
 var players = [];
+var playerOrder = [];
 
 function emitToAllPlayers(msg, payload){
     players.forEach(function(player){
-        var socket = players_to_sockets[player];
+        var socket = players_to_sockets[player.name];
         socket.emit(msg, payload);
     });
 }
@@ -103,11 +104,30 @@ io.on('connection', function(socket){
             // Add the player
             players_to_sockets[playername] = socket;
             socket_ids_to_players[socket.id] = playername;
-            players.push(playername);
-            players = players.sort();
+            players.push({
+                name: playername,
+                id: socket.id
+            });
+            players = players.sort(function(thisPlayer, thatPlayer) {
+              var thisName = thisPlayer.name.toUpperCase(); // ignore upper and lowercase
+              var thatName = thisPlayer.name.toUpperCase(); // ignore upper and lowercase
+              if (thisName < thatName) {
+                return -1;
+              }
+              if (thisName > thatName) {
+                return 1;
+              }
+
+              // names must be equal
+              return 0;
+            });
+            playerOrder.push(socket.id);
 
             // Respond to the player that was just added
-            socket.emit('added', playername);
+            socket.emit('added', {
+                name: playername,
+                id: socket.id
+            });
 
             // Broadcast the addition to other players
             emitToAllPlayers('update list', players);
@@ -121,7 +141,8 @@ io.on('connection', function(socket){
         if(playername){
             delete socket_ids_to_players[socket.id];
             delete players_to_sockets[playername];
-            var i = players.indexOf(playername);
+            var i = playerOrder.indexOf(socket.id);
+            playerOrder.splice(i,1);
             players.splice(i,1);
 
             emitToAllPlayers('update list', players);

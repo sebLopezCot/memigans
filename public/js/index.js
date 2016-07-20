@@ -2,8 +2,6 @@
 	// Init variables
 	var socket = io();
 
-	window.thisPlayer = null;
-
 	$(document).ready(function(){
 		$("#enterButton").on('click', function(){
 			addUser();
@@ -15,7 +13,6 @@
 		if(name != ""){
 			// Strip tags
 			var cleaned = name.replace(/(<([^>]+)>)/ig,"");
-			cleaned = cleaned.split(' ')[0];
 
 			// Add player to game request
 			socket.emit('add player', cleaned);
@@ -31,7 +28,7 @@
 	}
 
 	// When player is added to game successfully
-	socket.on('added', function(playername){
+	socket.on('added', function(player){
 		clearIndexState();
 	});
 
@@ -39,7 +36,7 @@
 		$("#player-list").html('');
 
 		players.forEach(function(player){
-			$("#player-list").append('<li id="player_'+player+'">'+player+'</li>');
+			$("#player-list").append('<li id="player_'+player.id.toString()+'">'+player.name+'</li>');
 		});
 	});
 
