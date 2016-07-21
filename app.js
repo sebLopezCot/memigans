@@ -12,6 +12,8 @@ var connectAssets = require('connect-assets');
 
 var routes = require('./routes');
 
+var helper = require('./util/helper-functions');
+
 // Set server port and listener
 app.set('port', process.env.PORT || 5000);
 
@@ -78,7 +80,6 @@ app.use(function(err, req, res, next) {
 });
 
 
-module.exports = app;
 
 // Socket Events ----------------------------------------------------------
 
@@ -108,20 +109,8 @@ io.on('connection', function(socket){
                 name: playername,
                 id: socket.id
             });
-            players = players.sort(function(thisPlayer, thatPlayer) {
-              var thisName = thisPlayer.name.toUpperCase(); // ignore upper and lowercase
-              var thatName = thisPlayer.name.toUpperCase(); // ignore upper and lowercase
-              if (thisName < thatName) {
-                return -1;
-              }
-              if (thisName > thatName) {
-                return 1;
-              }
-
-              // names must be equal
-              return 0;
-            });
-            playerOrder.push(socket.id);
+            players = players.sort(helper.byKey('name'));
+            playerOrder = players.map(function(player){ return player.id });
 
             // Respond to the player that was just added
             socket.emit('added', {
@@ -150,3 +139,10 @@ io.on('connection', function(socket){
     });
 
 });
+
+
+module.exports = app;
+
+
+
+
