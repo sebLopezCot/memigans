@@ -7,7 +7,7 @@ module.exports = {
 	// When a player is asking to be added
 	'add player': function addPlayerCall(socket){
 		return function addPlayer(playername){
-			if(gs.mode == gs.LOBBY_MODE){
+			if(gs.mode && gs.mode.name == 'lobby'){
 				if(gs.players_to_sockets[playername]){
 	                socket.emit('already exists');
 	            } else {
