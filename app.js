@@ -12,8 +12,6 @@ var connectAssets = require('connect-assets');
 
 var routes = require('./routes');
 
-var helper = require('./util/helper-functions');
-
 // Set server port and listener
 app.set('port', process.env.PORT || 5000);
 
@@ -83,62 +81,7 @@ app.use(function(err, req, res, next) {
 
 // Socket Events ----------------------------------------------------------
 
-var players_to_sockets = {};
-var socket_ids_to_players = {};
-var players = [];
-var playerOrder = [];
-
-function emitToAllPlayers(msg, payload){
-    players.forEach(function(player){
-        var socket = players_to_sockets[player.name];
-        socket.emit(msg, payload);
-    });
-}
-
-io.on('connection', function(socket){
-
-    // When a player is requested to be added
-    socket.on('add player', function (playername) {
-        if(players_to_sockets[playername]){
-            socket.emit('already exists');
-        } else {
-            // Add the player
-            players_to_sockets[playername] = socket;
-            socket_ids_to_players[socket.id] = playername;
-            players.push({
-                name: playername,
-                id: socket.id
-            });
-            players = players.sort(helper.byKey('name'));
-            playerOrder = players.map(function(player){ return player.id });
-
-            // Respond to the player that was just added
-            socket.emit('added', {
-                name: playername,
-                id: socket.id
-            });
-
-            // Broadcast the addition to other players
-            emitToAllPlayers('update list', players);
-        }
-
-    });
-
-    // When a player disconnects
-    socket.on('disconnect', function(){
-        var playername = socket_ids_to_players[socket.id];
-        if(playername){
-            delete socket_ids_to_players[socket.id];
-            delete players_to_sockets[playername];
-            var i = playerOrder.indexOf(socket.id);
-            playerOrder.splice(i,1);
-            players.splice(i,1);
-
-            emitToAllPlayers('update list', players);
-        }
-    });
-
-});
+require('./socket/socket-server')(io);
 
 
 module.exports = app;
