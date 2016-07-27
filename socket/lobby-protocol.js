@@ -10,8 +10,6 @@ module.exports = {
 		return function everyoneIn(){
 			if(gs.players.length > 1){
 				gs.changeTo(gameMode);
-
-				socketHelper.emitToAllPlayers('game started');
 			}
 		};
 	}

@@ -6,16 +6,16 @@ var listHelper = require('../util/list-helper');
 module.exports = {
 	// When a player is asking to be added
 	'add player': function addPlayerCall(socket){
-		return function addPlayer(playername){
-			if(gs.mode && gs.mode.name == 'lobby'){
-				if(gs.players_to_sockets[playername]){
+		return function addPlayer(config){
+			if(gs.mode != null){
+				if(gs.players_to_sockets[config.playername]){
 	                socket.emit('already exists');
 	            } else {
 	                // Add the player
-	                gs.players_to_sockets[playername] = socket;
-	                gs.socket_ids_to_players[socket.id] = playername;
+	                gs.players_to_sockets[config.playername] = socket;
+	                gs.socket_ids_to_players[socket.id] = config.playername;
 	                gs.players.push({
-	                    name: playername,
+	                    name: config.playername,
 	                    id: socket.id
 	                });
 	                gs.players = gs.players.sort(listHelper.sortByKey('name'));
@@ -23,12 +23,17 @@ module.exports = {
 
 	                // Respond to the player that was just added
 	                socket.emit('added', {
-	                    name: playername,
+	                    name: config.playername,
 	                    id: socket.id
 	                });
 
 	                // Broadcast the addition to other players
 	                socketHelper.emitToAllPlayers('update list', gs.players);
+
+	                if(config.syncAfter){
+	                	gs.sync(socket);
+	                }
+
 	            }
 			}
 		};

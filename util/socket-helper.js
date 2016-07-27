@@ -18,6 +18,21 @@ module.exports = {
         }
     },
 
+    emitToEachPlayer: function emitToEachPlayer(msg, func){
+        if(gs){
+            gs.players.forEach(function(player){
+                var socket = gs.players_to_sockets[player.name];
+                if(socket){
+                    socket.emit(msg, func(player));
+                } else {
+                    eh.socketUndefinedError();
+                }
+            });
+        } else {
+            eh.noGSError();
+        }
+    },
+
     loadProtocol: function loadProtocol(protocol, socket){
     	if(gs){
             if(socket){
