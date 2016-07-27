@@ -1,6 +1,9 @@
 # Built assets
 builtAssets
 
+# Webstorm project files
+.idea
+
 # Logs
 logs
 *.log

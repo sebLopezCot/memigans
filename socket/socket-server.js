@@ -10,8 +10,18 @@ function setupSocketServer(io){
         // Load default game protocols
         socketHelper.loadProtocol(generalProtocol, socket);
 
-        // Load default game mode
-        gs.changeTo(lobbyMode);
+        // Load default game mode if not already loaded
+        if(gs.mode == null){
+            gs.changeTo(lobbyMode);
+        }
+
+        // Check to see if the game is in lobby mode
+        if(gs.mode.name != 'lobby'){
+            socket.emit('locked out');
+        } else {
+            // Sync the local socket with the right game mode
+            gs.sync(socket);
+        }
     });
 }
 

@@ -7,11 +7,11 @@ var lobbyProtocol = require('../socket/lobby-protocol');
 module.exports = {
 	name: 'lobby',
 	
-	start: function(){
-		socketHelper.loadProtocol(lobbyProtocol);
+	start: function start(socket){
+		socketHelper.loadProtocol(lobbyProtocol, socket);
 	},
 
-	finish: function(){
+	finish: function finish(){
 		socketHelper.unloadProtocol(lobbyProtocol);
 	}
 };

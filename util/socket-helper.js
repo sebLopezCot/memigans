@@ -7,32 +7,37 @@ module.exports = {
         if(gs){
         	gs.players.forEach(function(player){
 	            var socket = gs.players_to_sockets[player.name];
-	            socket.emit(msg, payload);
+                if(socket){
+	               socket.emit(msg, payload);
+                } else {
+                    eh.socketUndefinedError();
+                }
 	        });
         } else {
             eh.noGSError();
         }
     },
 
-    loadProtocol: function loadProtocol(protocol){
-    	if(gs){
-    		for(playerName in gs.players_to_sockets){
-				var socket = gs.players_to_sockets[playerName];
-
-				for(action in protocol){
-					socket.on(action, protocol[action](socket));
-				}
-			}
-    	} else {
-            eh.noGSError();
-        }
-    },
-
     loadProtocol: function loadProtocol(protocol, socket){
     	if(gs){
-    		for(action in protocol){
-				socket.on(action, protocol[action](socket));
-			}
+            if(socket){
+                for(action in protocol){
+                    socket.on(action, protocol[action](socket));
+                }
+            } else {
+                for(playerName in gs.players_to_sockets){
+                    var socket = gs.players_to_sockets[playerName];
+
+                    if(socket){
+                        for(action in protocol){
+                            socket.on(action, protocol[action](socket));
+                        }
+                    } else {
+                        eh.socketUndefinedError();
+                    }
+                }
+            }
+
     	} else {
             eh.noGSError();
         }
@@ -43,9 +48,13 @@ module.exports = {
     		for(playerName in gs.players_to_sockets){
 				var socket = gs.players_to_sockets[playerName];
 
-				for(action in protocol){
-					socket.off(action);
-				}
+                if(socket){
+    				for(action in protocol){
+    					socket.removeAllListeners(action);
+    				}
+                } else {
+                    eh.socketUndefinedError();
+                }
 			}
     	} else {
             eh.noGSError();

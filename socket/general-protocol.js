@@ -46,6 +46,11 @@ module.exports = {
 	            gs.players.splice(i,1);
 
 	            socketHelper.emitToAllPlayers('update list', gs.players);
+
+	            if(gs.players.length < 1){
+	            	gs.mode = null;	// check to see how other games handle this issue
+	            	socket.broadcast.emit('game ended');
+	            }
 	        }
 		};
 	}

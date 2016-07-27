@@ -6,6 +6,10 @@
 		$("#enterButton").on('click', function(){
 			addUser();
 		});
+
+		$("#readyButton").on('click', function(){
+			socket.emit('everyone in');
+		});
 	});
 
 	function addUser () {
@@ -42,6 +46,21 @@
 
 	socket.on('already exists', function(){
 		alert("Someone already has that name");
+	});
+
+	socket.on('game started', function(){
+		$('#players').toggleClass('hidden', true);
+		alert("In the game.");
+	});
+
+	socket.on('locked out', function(){
+		$("#players").toggleClass('hidden', true);
+		$("#join").toggleClass('hidden', true);
+		alert("A game has started already. Wait to enter the next one.");
+	});
+
+	socket.on('game ended', function(){
+		window.location.reload();
 	});
 
 })(window);

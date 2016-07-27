@@ -16,5 +16,11 @@ module.exports = {
     	if(this.mode){
     		this.mode.start();
     	}
+    },
+
+    sync: function sync(socket){
+        if(this.mode){
+            this.mode.start(socket);
+        }
     }
 };
